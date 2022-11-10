@@ -22,62 +22,6 @@ jobs:
           )
           echo "nfs=[\"$nfs_json\"]" >> $GITHUB_OUTPUT
 
-  lint-env-and-nf:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: jidicula/clang-format-action@v4.9.0
-
-  # TODO lint-tool
-
-  # TODO document-env
-
-  compile-nf:
-    needs: [list-nfs, lint-env-and-nf]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nf: ${{ fromJSON(needs.list-nfs.outputs.nfs) }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        if: matrix.nf == 'rust-policer'
-        with:
-          toolchain: nightly
-          components: rust-src
-      - run: make compile-${{ matrix.nf }}
-
-  build-nf:
-    needs: [list-nfs, compile-nf]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nf: ${{ fromJSON(needs.list-nfs.outputs.nfs) }}
-        os: [linux, metal, dpdk]
-        net: [tinynf, dpdk]
-        exclude:
-          - os: dpdk
-            net: tinynf
-          - os: metal
-            net: dpdk
-          # TODO need lpm_*
-          - nf: router
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        if: matrix.nf == 'rust-policer'
-        with:
-          toolchain: nightly
-          components: rust-src
-      - name: install DPDK deps
-        if: matrix.net == 'dpdk'
-        run: |
-          sudo apt update
-          sudo apt install libnuma-dev
-      - name: create dummy OS config
-        run: echo '{.bus = 0x00, .device = 0x00, .function = 0x0}' > env/config
-      - run: make OS=${{ matrix.os }} NET=${{ matrix.net }} build-${{ matrix.nf }}
-
   test-tool:
     runs-on: ubuntu-latest
     steps:
@@ -90,7 +34,7 @@ jobs:
       - run: make tool-test
 
   verify-nf:
-    needs: [list-nfs, build-nf, test-tool]
+    needs: [list-nfs, test-tool]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -130,3 +74,4 @@ jobs:
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
           packages_dir: tool/dist
+          repository_url: https://test.pypi.org
