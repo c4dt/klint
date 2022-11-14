@@ -1,8 +1,5 @@
 # Common stuff for makefiles, like compiler and flags
 
-# Allow the use of advanced globs in paths
-SHELL := /bin/bash -O extglob -O globstar -c
-
 # GCC and ld by default
 # Clang is supported in the sense that setting CC=clang LD=ld.lld works,
 # but performance may or may not be the same, it's mostly useful for -Weverything
