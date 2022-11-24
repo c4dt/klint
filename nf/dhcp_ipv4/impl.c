@@ -1,5 +1,4 @@
 #include "dhcp.h"
-
 #include "net/packet.h"
 #include "net/skeleton.h"
 #include "os/memory.h"

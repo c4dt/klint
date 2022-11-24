@@ -18,8 +18,8 @@ jobs:
         name: list nfs
         run: |
           nfs_json=$(
-            find nf -mindepth 1 -maxdepth 1 -type d |
-              cut -d/ -f2 |
+            find nf nf/bpf -mindepth 1 -maxdepth 1 -type d -not -name bpf |
+              cut -d/ -f 2- |
               xargs |
               sed 's/ /","/g'
           )

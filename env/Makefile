@@ -27,7 +27,7 @@ OUTPUT := bin
 THIS_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 # Use our global makefile, for the compiler and such
-include $(THIS_DIR)/../Makefile.base
+include $(THIS_DIR)/../base.mk
 
 # Our includes
 CFLAGS += -I$(THIS_DIR)/include
