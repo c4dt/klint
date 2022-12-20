@@ -16,9 +16,16 @@ NF_CFLAGS += -I$(ROOT_DIR)/env/include
 # all compiles w/ libbpf
 NF_BPFLAGS := $(shell pkg-config libbpf --cflags)
 
+# add host headers for Ubuntu
+ifeq ($(shell lsb_release -si),Ubuntu)
+NF_BPFLAGS += -I/usr/include/$(shell arch)-linux-gnu
+endif
+
 # avoid underscoring every basic types
 NF_BPFLAGS += -D u8=__u8 -D u16=__u16 -D u32=__u32 -D u64=__u64
 NF_BPFLAGS += -D __wsum=__u32 -D __sum16=__u16
+
+# targets
 
 nf/%/libnf.so: CFLAGS := $(NF_CFLAGS)
 nf/%/libnf.so: nf/%/impl.c
@@ -40,6 +47,5 @@ nf/rust-policer/target/$(CARGO_TARGET)/release/librust_policer.so: $(wildcard nf
 
 .PHONY: $(addprefix compile-,$(NFs))
 $(addprefix compile-,$(NFs)): compile-%: nf/%/libnf.so
-
 .PHONY: compile-all
 compile-all: $(foreach NF,$(NFs),nf/$(NF)/libnf.so)

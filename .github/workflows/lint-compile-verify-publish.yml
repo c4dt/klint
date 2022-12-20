@@ -45,6 +45,11 @@ jobs:
         with:
           toolchain: nightly
           components: rust-src
+      - name: install eBPF deps
+        if: startsWith(matrix.nf, 'bpf/')
+        run: |
+          sudo apt update
+          sudo apt install libbpf-dev linux-headers-$(uname -r)
       - run: make compile-${{ matrix.nf }}
 
   build-nf:
@@ -74,6 +79,11 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libnuma-dev
+      - name: install eBPF deps
+        if: startsWith(matrix.nf, 'bpf/')
+        run: |
+          sudo apt update
+          sudo apt install libbpf-dev linux-headers-$(uname -r)
       - name: create dummy OS config
         run: echo '{.bus = 0x00, .device = 0x00, .function = 0x0}' > env/config
       - run: make OS=${{ matrix.os }} NET=${{ matrix.net }} build-${{ matrix.nf }}
@@ -110,6 +120,11 @@ jobs:
         with:
           toolchain: nightly
           components: rust-src
+      - name: install eBPF deps
+        if: startsWith(matrix.nf, 'bpf/')
+        run: |
+          sudo apt update
+          sudo apt install libbpf-dev linux-headers-$(uname -r)
       - run: make verify-${{ matrix.nf }}
         env:
           CFLAGS: -mno-avx512f -mno-avx512vl # angr>vex doesn't support some avx512

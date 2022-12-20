@@ -20,9 +20,13 @@ build-%: compile-%
 	$(MAKE) -C $(ROOT_DIR)/env NF=$(ROOT_DIR)/nf/$*/libnf.so OS=$(OS) NET=$(NET) OS_CONFIG=$(OS_CONFIG) NF_CONFIG=$(ROOT_DIR)/nf/$*/config
 
 include $(ROOT_DIR)/tool/tool.mk
-verify-%: compile-% | tool-venv
+
+.PHONY: $(addprefix verify-,$(NFs))
+$(addprefix verify-,$(NFs)): verify-%: compile-% | tool-venv
 	. $(TOOL_VENV_DIR)/bin/activate && \
 		klint libnf $(ROOT_DIR)/nf/$*/libnf.so $(ROOT_DIR)/nf/$*/spec.py
+.PHONY: verify-all
+verify-all: compile-all
 
 benchmark-%: compile-%
 	@if [ ! -f $(ROOT_DIR)/benchmarking/config ]; then echo 'Please set the benchmarking config, see $(ROOT_DIR)/benchmarking/ReadMe.md'; exit 1; fi
