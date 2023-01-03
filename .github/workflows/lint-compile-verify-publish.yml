@@ -65,9 +65,9 @@ jobs:
             net: tinynf
           - os: metal
             net: dpdk
-          - nf: bpf
           # TODO need lpm_*
           - nf: router
+    if: not(startsWith(matrix.nf, 'bpf/'))
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rust-lang/setup-rust-toolchain@v1
