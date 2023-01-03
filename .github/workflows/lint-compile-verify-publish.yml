@@ -65,7 +65,7 @@ jobs:
             net: tinynf
           - os: metal
             net: dpdk
-          - nf: bpf/*
+          - nf: bpf/bridge
           # TODO need lpm_*
           - nf: router
     steps:
